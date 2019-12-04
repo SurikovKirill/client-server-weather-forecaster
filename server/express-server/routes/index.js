@@ -8,25 +8,6 @@ const fetch = require('node-fetch');
 const assert = require('assert');
 const mongoClient = new MongoClient("mongodb://localhost:27017/", { useNewUrlParser: true }, { useUnifiedTopology: true });
 
-function parseData(data, status){
-  return({
-    weather : {
-      name: data.name,
-      img: "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png",
-      temperature: (data.main.temp - 273.15).toFixed(0) + '°C',
-      wind: data.wind.speed + ' m/s',
-      cloudiness: data.weather[0].description,
-      pressure: data.main.pressure + ' hpa',
-      humidity: data.main.humidity + ' %',
-      location: '[' + data.coord.lat + ',' + data.coord.lon + ']',
-    },
-    isOk: status,
-  });
-}
-
-
-
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -40,7 +21,6 @@ router.get('/weather', function (req, res, next){
     .then((response)=>{
       response.json()
         .then((data)=>{
-          //result = parseData(data, response.ok);
           res.set('Content-Type', 'application/json').status(200).json(data);
         });
     })
@@ -58,8 +38,6 @@ router.get('/weather/coordinates', function(req, res, next){
     .then((response)=>{
       response.json()
         .then((data)=>{
-          //result = parseData(data);
-          //console.log(data);
           res.set('Content-Type', 'application/json').status(200).json(data);
         });  
     })
@@ -90,42 +68,16 @@ router.post('/favourites', function(req, res, next){
           collection.insertOne(tmp, function(err, result){
             if(err){ 
               return console.log(err);
-            }
-            
+            }           
             res.status(201).end();
-            //client.close();
           });
         }
         else {
           
           res.status(406).end();
-          //client.close();
         }
-      })
-    
-    
+      })  
   });
-  // fetch(`${url}?q=${req.body.name}&appid=${tokenAPI}`)
-  //   .then((response)=>{
-  //     response.json()
-  //       .then((data)=>{
-  //         tmp = parseData(data, response.ok);
-  //         mongoClient.connect(function(err, client){
-  //           const db = client.db('cities');
-  //           const collection = db.collection('citycol');
-  //           collection.insertOne(tmp, function(err, result){
-  //             if(err){ 
-  //               return console.log(err);
-  //             }
-  //             res.status(201).end();
-  //             client.close();
-  //           });
-  //         });
-  //       });
-  //   })
-  //   .catch(error => {
-  //     res.status(400).send(error.message);
-  //   });
 });
 
 /*GET get all cities from favourites*/
@@ -141,7 +93,6 @@ router.get('/favourites', function(req, res, next){
         return;
       }
        res.set('Content-Type', 'application/json').json(docs);
-       //client.close();
     });
   });
 });
@@ -158,7 +109,6 @@ router.delete('/favourites', function(req, res, next){
         return;
       }
       res.status(200).end();
-      //client.close();
     });
   });
 });
